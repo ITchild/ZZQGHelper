@@ -3,20 +3,26 @@ package com.fei.zzqghelper;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Criteria;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,16 +32,24 @@ import android.widget.Toast;
 
 import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private TextView main_jingdu_tv;
     private ImageView main_luopan_iv;
+    private RatoImageView main_selfView_riv;
     private EditText main_dushu_et;
     private Button main_dushu_bt;
+    private Button main_big,main_small;
     private LocationManager lManager;
     private Button main_location_bt;
     private RadioGroup main_choiceGroup_rg;
+    private Button main_add,main_sub;
+    private Button main_shoudong_bt;
     private String Model = LocationManager.NETWORK_PROVIDER;
+    private boolean isAdd = false;
+    private boolean isHand = false;
+
+    private MoveRelativeLayout main_show_rl;
 
     private static final int BAIDU_READ_PHONE_STATE = 100;//定位权限请求
     private static final int PRIVATE_CODE = 1315;//开启GPS权限
@@ -50,9 +64,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
+        initData();
         initListener();
+//        initLocation();
 
-        initLocation();
+        // 传感器管理器
+        SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+        // 注册传感器(Sensor.TYPE_ORIENTATION(方向传感器);SENSOR_DELAY_FASTEST(0毫秒延迟);
+        // SENSOR_DELAY_GAME(20,000毫秒延迟)、SENSOR_DELAY_UI(60,000毫秒延迟))
+        sm.registerListener(MainActivity.this,
+                sm.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                SensorManager.SENSOR_DELAY_FASTEST);
 
     }
 
@@ -61,8 +83,28 @@ public class MainActivity extends AppCompatActivity {
         main_location_bt = findViewById(R.id.main_location_bt);
         main_choiceGroup_rg = findViewById(R.id.main_choiceGroup_rg);
         main_luopan_iv = findViewById(R.id.main_luopan_iv);
+        main_selfView_riv = findViewById(R.id.main_selfView_riv);
         main_dushu_et = findViewById(R.id.main_dushu_et);
         main_dushu_bt = findViewById(R.id.main_dushu_bt);
+        main_add = findViewById(R.id.main_add);
+        main_sub = findViewById(R.id.main_sub);
+        main_big = findViewById(R.id.main_big);
+        main_small = findViewById(R.id.main_small);
+        main_show_rl = findViewById(R.id.main_show_rl);
+        main_shoudong_bt = findViewById(R.id.main_shoudong_bt);
+
+        ViewGroup.LayoutParams para1 = main_show_rl.getLayoutParams();
+        para1.height = ScreenUtil.getScreenWidth();
+        para1.width = ScreenUtil.getScreenWidth();
+        main_show_rl.setLayoutParams(para1);
+        ViewGroup.LayoutParams para2 = main_luopan_iv.getLayoutParams();
+        para2.height = ScreenUtil.getScreenWidth();
+        para2.width = ScreenUtil.getScreenWidth();
+        main_luopan_iv.setLayoutParams(para2);
+    }
+
+    private void initData(){
+        main_selfView_riv.setImageView(((BitmapDrawable)getResources().getDrawable(R.drawable.luopan)).getBitmap());
     }
 
     private void initListener(){
@@ -91,7 +133,8 @@ public class MainActivity extends AppCompatActivity {
                 String num = main_dushu_et.getText().toString();
                 if(null != num && !num.equals("")) {
                     int numi = Integer.parseInt(num);
-                    main_luopan_iv.setRotation(numi);
+//                    main_luopan_iv.setRotation(numi);
+                    setR(numi);
                 }else{
                     Toast.makeText(MainActivity.this,"请输入要设置的度数",Toast.LENGTH_SHORT).show();
                 }
@@ -114,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
                     if (numi < 0) {
                         main_dushu_et.setText("0");
                     }
+                }else{
+                    main_dushu_et.setText("0");
                 }
             }
 
@@ -122,7 +167,114 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+        main_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String num = main_dushu_et.getText().toString();
+                if(null != num && !num.equals("")) {
+                    int numi = Integer.parseInt(num);
+                    numi++;
+                    if(numi >= 360){
+                        numi = 0;
+                    }
+                    setR(numi);
+                    main_dushu_et.setText(numi+"");
+                }
+            }
+        });
+
+        main_sub.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String num = main_dushu_et.getText().toString();
+                if(null != num && !num.equals("")) {
+                    int numi = Integer.parseInt(num);
+                    numi--;
+                    if(numi < 0){
+                        numi = 359;
+                    }
+                    setR(numi);
+                    main_dushu_et.setText(numi+"");
+                }
+            }
+        });
+        main_add.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                isAdd = true;
+                mHandler.post(mRunnable);
+                return false;
+            }
+        });
+        main_sub.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                isAdd = false;
+                mHandler.post(mRunnable);
+                return false;
+            }
+        });
+        main_big.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                main_show_rl.setScaleX(2);
+                main_show_rl.setScaleY(2);
+            }
+        });
+        main_small.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                main_show_rl.setScaleX(1);
+                main_show_rl.setScaleY(1);
+            }
+        });
+        main_shoudong_bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isHand = isHand ? false : true ;
+            }
+        });
     }
+
+
+    private Handler mHandler = new Handler();
+
+    private Runnable mRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if(isAdd){
+                if(main_add.isPressed()){
+                    String num = main_dushu_et.getText().toString();
+                    if(null != num && !num.equals("")) {
+                        int numi = Integer.parseInt(num);
+                        numi++;
+                        if(numi >= 360){
+                            numi = 0;
+                        }
+                        setR(numi);
+                        main_dushu_et.setText(numi+"");
+                    }
+                    mHandler.postDelayed(mRunnable,50);
+                }
+            }else{
+                if(main_sub.isPressed()){
+                    String num = main_dushu_et.getText().toString();
+                    if(null != num && !num.equals("")) {
+                        int numi = Integer.parseInt(num);
+                        numi--;
+                        if(numi < 0){
+                            numi = 359;
+                        }
+                        setR(numi);
+                        main_dushu_et.setText(numi+"");
+                    }
+                    mHandler.postDelayed(mRunnable,50);
+                }
+            }
+        }
+    };
+
 
     private void initLocation() {
         if(null == lManager) {
@@ -144,6 +296,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent();
             intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
             startActivityForResult(intent, PRIVATE_CODE);
+            return;
         }
 
         /**
@@ -209,4 +362,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setR(float r){
+        main_selfView_riv.setRotation(360-r);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ORIENTATION) {
+            float degree = sensorEvent.values[0];
+            if(!isHand) {
+                setR(degree);
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
 }

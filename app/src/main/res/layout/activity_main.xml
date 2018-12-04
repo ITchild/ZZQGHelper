@@ -1,83 +1,172 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/main_location_bt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="获取定位信息"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/main_jingdu_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Hello World!" />
-    </LinearLayout>
-
-    <RadioGroup
-        android:id="@+id/main_choiceGroup_rg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <RadioButton
-            android:id="@+id/main_Net_rb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="网络定位"/>
-
-        <RadioButton
-            android:id="@+id/main_gps_rb"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="GPS定位"/>
-
-    </RadioGroup>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/main_dushu_et"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:inputType="number"
-            android:hint="请输入0~360"/>
-
-        <Button
-            android:id="@+id/main_dushu_bt"
-            android:layout_width="0dip"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="设置"/>
-
-    </LinearLayout>
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <ImageView
-            android:id="@+id/main_luopan_iv"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/luopan"/>
+            android:orientation="horizontal">
 
-    </RelativeLayout>
+            <Button
+                android:id="@+id/main_location_bt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取定位信息" />
 
-</LinearLayout>
+            <TextView
+                android:id="@+id/main_jingdu_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Hello World!" />
+        </LinearLayout>
+
+        <RadioGroup
+            android:id="@+id/main_choiceGroup_rg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/main_Net_rb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="网络定位" />
+
+            <RadioButton
+                android:id="@+id/main_gps_rb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="GPS定位" />
+
+        </RadioGroup>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/main_dushu_et"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="请输入0~360"
+                android:inputType="number"
+                android:text="0" />
+
+            <Button
+                android:id="@+id/main_dushu_bt"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="设置" />
+
+            <Button
+                android:id="@+id/main_shoudong_bt"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="手动" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/main_big"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:visibility="invisible"
+                    android:text="放大" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"></View>
+
+                <Button
+                    android:id="@+id/main_add"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="向左" />
+            </LinearLayout>
+
+            <com.fei.zzqghelper.MoveRelativeLayout
+                android:id="@+id/main_show_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dip"
+                    android:layout_centerInParent="true"
+                    android:background="@color/colorAccent"></View>
+
+                <View
+                    android:layout_width="1dip"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:background="@color/colorAccent"></View>
+
+                <ImageView
+                    android:id="@+id/main_luopan_iv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/luopan"
+                    android:visibility="gone" />
+
+                <com.fei.zzqghelper.RatoImageView
+                    android:id="@+id/main_selfView_riv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true" />
+            </com.fei.zzqghelper.MoveRelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/main_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:visibility="invisible"
+                    android:text="缩小" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"></View>
+
+                <Button
+                    android:id="@+id/main_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:text="向右" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
